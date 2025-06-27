@@ -14,7 +14,3 @@ dp = Dispatcher()
 
 dp.update.middleware(SessionMiddleware(async_session_maker))
 dp.update.middleware(LoggingMiddleware())
-
-async def get_db() -> AsyncSession:
-    async with async_session_maker() as session:
-        return session
