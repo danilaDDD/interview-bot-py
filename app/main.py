@@ -1,6 +1,8 @@
 import asyncio
 
-from aiogram import Bot, Dispatcher, F
+from aiogram import Bot, Dispatcher, F, Router
+from aiogram.types import Message
+
 from app.setting.logging import *
 from aiogram.filters import Command
 
@@ -11,20 +13,22 @@ setting = load_settings()
 bot = Bot(token=setting.BOT_TOKEN)
 dp = Dispatcher()
 
-@dp.message(Command('start'))
-async def start_command(message):
-    await message.answer("Welcome to Interview48 Bot! How can I assist you today?")
-    await message.answer("Your chat ID is: " + str(message.chat.id))
+router = Router()
 
-@dp.message(Command('echo'))
-async def echo_command(message):
+@router.message(Command('start'))
+async def start_command(message: Message):
+    await message.answer("Welcome to Interview48 Bot! How can I assist you today?")
+
+@router.message(Command('echo'))
+async def echo_command(message: Message):
     await message.answer(f"You said: {message.text.replace('/echo', '').strip()}")
 
-@dp.message(F.text)
-async def text_message_handler(message):
+@router.message(F.text)
+async def text_message_handler(message: Message):
     await message.answer("Unknown command or message. Please use /start or /echo.")
 
 async def main():
+    dp.include_router(router)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot, )
 

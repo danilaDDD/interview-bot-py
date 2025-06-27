@@ -2,3 +2,5 @@ env/.env*
 .idea
 .idea/*
 /user.session
+/test/report.log
+/logs/errors.log
