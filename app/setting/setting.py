@@ -23,8 +23,6 @@ class Settings(BaseSettings):
     DB_USER: str = "root"
     DB_PASS: str
     DB_NAME: str
-    TEST_API_ID: str = ''
-    TEST_API_HASH: str = ''
 
     def get_database_url(self) -> str:
         return f"{self.DB_DRIVER_PREFIX}://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
