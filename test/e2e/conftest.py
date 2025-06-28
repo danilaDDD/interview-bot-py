@@ -2,17 +2,29 @@ from unittest.mock import Mock, AsyncMock, PropertyMock
 
 import pytest
 import pytest_asyncio
-from aiogram.types import Message
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, Chat, User
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from app.models.account import Account
 
+@pytest.fixture(scope="session")
+def current_chat() -> Chat:
+    return Chat(id=123456789, type="private", title="Test Chat", username="test_chat")
+
+@pytest.fixture(scope="session")
+def current_user() -> User:
+    return User(id=987654321, is_bot=False, first_name="Test", last_name="User", username="test_user")
+
 @pytest.fixture
-def mock_message() -> Message:
+def message(current_chat: Chat, current_user) -> Message:
     mock = Mock(spec=Message)
     mock.answer = AsyncMock()
     mock.text = PropertyMock(spec=str)
+    mock.from_user = current_user
+
+    mock.chat = current_chat
 
     return mock
 
@@ -30,5 +42,12 @@ async def db(test_settings):
         await clean_database(session)
         yield session
 
+@pytest.fixture
+def state() -> FSMContext:
+    state = Mock(spec=FSMContext)
+    state.set_state = AsyncMock()
+    state.clear = AsyncMock()
+    state.state = PropertyMock(spec=str)
 
+    return state
 
