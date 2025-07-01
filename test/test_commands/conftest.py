@@ -8,6 +8,9 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from app.models.account import Account
+from app.setting.initial import dp
+from test.test_commands.mock import MockFSMContext
+
 
 @pytest.fixture(scope="session")
 def current_chat() -> Chat:
@@ -23,7 +26,6 @@ def message(current_chat: Chat, current_user) -> Message:
     mock.answer = AsyncMock()
     mock.text = PropertyMock(spec=str)
     mock.from_user = current_user
-
     mock.chat = current_chat
 
     return mock
@@ -42,12 +44,8 @@ async def db(test_settings):
         await clean_database(session)
         yield session
 
-@pytest.fixture
-def state() -> FSMContext:
-    state = Mock(spec=FSMContext)
-    state.set_state = AsyncMock()
-    state.clear = AsyncMock()
-    state.state = PropertyMock(spec=str)
 
-    return state
+@pytest.fixture
+def state() -> MockFSMContext:
+    return MockFSMContext()
 
